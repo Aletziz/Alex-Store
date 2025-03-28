@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import API_URL from "../config/api";
 import {
   Container,
   Paper,
@@ -22,7 +23,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: "",
-    telefono: "", // Agregamos teléfono
+    telefono: "",
     direccion: "",
     email: "",
     numeroTarjeta: "",
@@ -41,8 +42,15 @@ const Checkout = () => {
   const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
   const [ordenId, setOrdenId] = useState(null);
 
-  const handleCheckout = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
+      const orderData = {
+        ...formData,
+        items: state.items,
+        total: calculateTotal(),
+      };
+
       const response = await fetch(`${API_URL}/checkout`, {
         method: "POST",
         headers: {

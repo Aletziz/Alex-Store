@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import API_URL from "../config/api";
 import { Grid, Container, TextField } from "@mui/material";
 import ProductCard from "../components/ProductCard";
 
