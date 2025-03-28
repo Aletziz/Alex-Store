@@ -1,6 +1,6 @@
 const API_URL =
   process.env.NODE_ENV === "production"
-    ? "https://tu-backend.vercel.app/api"
-    : "http://localhost:5000/api";
+    ? "https://alex-store-backend.vercel.app/routes"
+    : "http://localhost:5000/routes";
 
 export default API_URL;

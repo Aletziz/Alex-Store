@@ -41,23 +41,9 @@ const Checkout = () => {
   const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
   const [ordenId, setOrdenId] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleCheckout = async () => {
     try {
-      const orderData = {
-        items: state.items,
-        total: calculateTotal(),
-        cliente: {
-          nombre: formData.nombre,
-          telefono: formData.telefono,
-          direccion: formData.direccion,
-          email: formData.email,
-        },
-        numeroTarjeta: formData.numeroTarjeta,
-        banco: formData.banco,
-      };
-
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_URL}/checkout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
