@@ -19,117 +19,174 @@ const Home = () => {
         sx={{
           background:
             mode === "dark"
-              ? "linear-gradient(135deg, #1E1E2F 0%, #2D2D44 100%)"
-              : "linear-gradient(45deg, #4353FF 30%, #6B7AFF 90%)",
+              ? "linear-gradient(165deg, #0A1128 0%, #1B3A6B 100%)"
+              : "linear-gradient(165deg, #3B82F6 0%, #6366F1 100%)",
           color: "#ffffff",
-          py: { xs: 8, md: 12 },
+          py: { xs: 12, md: 16 },
           position: "relative",
           overflow: "hidden",
-          borderBottom:
-            mode === "dark" ? "1px solid rgba(255,255,255,0.1)" : "none",
-          animation: "gradientMove 15s ease infinite",
-          "@keyframes gradientMove": {
-            "0%": { backgroundPosition: "0% 50%" },
-            "50%": { backgroundPosition: "100% 50%" },
-            "100%": { backgroundPosition: "0% 50%" },
-          },
           "&::before": {
             content: '""',
             position: "absolute",
-            top: "50%",
-            left: "50%",
+            top: "-50%",
+            left: "-50%",
             width: "200%",
             height: "200%",
-            transform: "translate(-50%, -50%)",
-            background: `radial-gradient(circle, ${
-              mode === "dark" ? "rgba(67,83,255,0.1)" : "rgba(255,255,255,0.1)"
-            } 0%, transparent 50%)`,
-            animation: "pulse 10s ease infinite",
-            "@keyframes pulse": {
-              "0%": { opacity: 0.5 },
-              "50%": { opacity: 0.8 },
-              "100%": { opacity: 0.5 },
-            },
+            background: `url('https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80')`,
+            backgroundSize: "cover",
+            opacity: 0.08,
+            animation: "rotarFondo 40s linear infinite",
+            filter: "blur(30px)",
+          },
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 70%)",
+            animation: "pulsoSuave 8s ease-in-out infinite",
+          },
+          "@keyframes rotarFondo": {
+            "0%": { transform: "rotate(0deg) scale(1)" },
+            "50%": { transform: "rotate(180deg) scale(1.2)" },
+            "100%": { transform: "rotate(360deg) scale(1)" },
+          },
+          "@keyframes pulsoSuave": {
+            "0%, 100%": { opacity: 0.3 },
+            "50%": { opacity: 0.7 },
           },
         }}
       >
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
-          <Grid container spacing={4} alignItems="center">
+          <Grid container spacing={8} alignItems="center">
             <Grid
               item
               xs={12}
-              md={6}
+              md={7}
               sx={{
-                animation: "slideIn 1s ease-out",
-                "@keyframes slideIn": {
-                  from: { transform: "translateX(-50px)", opacity: 0 },
-                  to: { transform: "translateX(0)", opacity: 1 },
+                animation: "slideUpFade 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                "@keyframes slideUpFade": {
+                  from: { transform: "translateY(30px)", opacity: 0 },
+                  to: { transform: "translateY(0)", opacity: 1 },
                 },
               }}
             >
-              <Logo size="large" variant="minimal" />
-              <Typography
-                variant="h3"
-                sx={{
-                  mt: 4,
-                  mb: 2,
-                  fontWeight: 700,
-                  textShadow:
-                    mode === "dark"
-                      ? "0 0 30px rgba(67,83,255,0.5)"
-                      : "2px 2px 4px rgba(0,0,0,0.3)",
-                  color: mode === "dark" ? "#fff" : "#fff",
-                }}
-              >
-                Tu Estilo, Tu Identidad
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  mb: 4,
-                  opacity: mode === "dark" ? 0.8 : 0.9,
-                  color: mode === "dark" ? "#E0E0E0" : "#fff",
-                }}
-              >
-                Encuentra las últimas tendencias y diseños exclusivos para ti
-              </Typography>
-              <Button
-                variant="contained"
-                size="large"
-                component={Link}
-                to="/productos"
-                sx={{
-                  bgcolor: mode === "dark" ? "#4353FF" : "#ffffff",
-                  color: mode === "dark" ? "#ffffff" : "#4353FF",
-                  position: "relative",
-                  overflow: "hidden",
-                  "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    left: "-100%",
-                    width: "100%",
-                    height: "100%",
-                    background:
-                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
-                    transition: "0.5s",
-                  },
-                  "&:hover": {
-                    bgcolor: mode === "dark" ? "#5363FF" : "#f5f5f5",
-                    transform: "translateY(-2px)",
-                    boxShadow:
-                      mode === "dark"
-                        ? "0 8px 25px rgba(67,83,255,0.5)"
-                        : "0 8px 25px rgba(67,83,255,0.2)",
-                    "&::before": {
-                      left: "100%",
+              <Box sx={{ mb: 6 }}>
+                <Typography
+                  component="span"
+                  sx={{
+                    display: "inline-block",
+                    background: "linear-gradient(90deg, #FFD700, #FFA500)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    color: "transparent",
+                    fontSize: "1.2rem",
+                    fontWeight: 600,
+                    mb: 2,
+                    animation: "brillar 2s ease-in-out infinite",
+                    "@keyframes brillar": {
+                      "0%, 100%": { opacity: 1 },
+                      "50%": { opacity: 0.7 },
                     },
-                  },
-                  transition: "all 0.3s ease",
-                }}
-              >
-                Explorar Productos
-              </Button>
+                  }}
+                >
+                  NUEVA COLECCIÓN 2024
+                </Typography>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: { xs: "2.5rem", md: "3.5rem" },
+                    fontWeight: 800,
+                    letterSpacing: "-1px",
+                    lineHeight: 1.1,
+                    mb: 3,
+                    background:
+                      mode === "dark"
+                        ? "linear-gradient(90deg, #fff 0%, #e0e0e0 100%)"
+                        : "linear-gradient(90deg, #fff 0%, #f0f0f0 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  Redefine tu Estilo Personal
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 300,
+                    lineHeight: 1.8,
+                    opacity: 0.9,
+                    maxWidth: "600px",
+                    mb: 5,
+                  }}
+                >
+                  Descubre piezas únicas que transformarán tu guardarropa.
+                  Calidad premium, diseños exclusivos y el mejor estilo para ti.
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 3,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    size="large"
+                    component={Link}
+                    to="/coleccion"
+                    sx={{
+                      background:
+                        "linear-gradient(45deg, #FFD700 30%, #FFA500 90%)",
+                      color: "#000",
+                      px: 4,
+                      py: 2,
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
+                      borderRadius: "full",
+                      textTransform: "none",
+                      boxShadow: "0 10px 20px rgba(255,215,0,0.2)",
+                      "&:hover": {
+                        transform: "translateY(-3px) scale(1.02)",
+                        boxShadow: "0 15px 30px rgba(255,215,0,0.3)",
+                      },
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    }}
+                  >
+                    Explorar Colección
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    component={Link}
+                    to="/lookbook"
+                    sx={{
+                      borderColor: "rgba(255,255,255,0.5)",
+                      borderWidth: 2,
+                      color: "#fff",
+                      px: 4,
+                      py: 2,
+                      fontSize: "1.1rem",
+                      fontWeight: 500,
+                      borderRadius: "full",
+                      textTransform: "none",
+                      "&:hover": {
+                        borderColor: "#fff",
+                        background: "rgba(255,255,255,0.1)",
+                        transform: "translateY(-3px)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Ver Lookbook
+                  </Button>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
         </Container>
