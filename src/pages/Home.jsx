@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Container, Typography, Button, Grid, Paper } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
-import Logo from "../components/Logo";
+import AnimatedBackground from "../components/AnimatedBackground";
 
 const Home = () => {
   const { mode } = useTheme();
@@ -280,6 +280,187 @@ const Home = () => {
           ))}
         </Grid>
       </Container>
+      <AnimatedBackground>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              position: "relative",
+              zIndex: 2,
+              py: 12,
+              px: { xs: 2, md: 6 },
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h3"
+              sx={{
+                mb: 6,
+                color: "#fff",
+                fontWeight: 700,
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: -16,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 100,
+                  height: 4,
+                  background:
+                    mode === "dark"
+                      ? "linear-gradient(90deg, #5363FF, #8B63FF)"
+                      : "linear-gradient(90deg, #ffffff, #ffffff80)",
+                  borderRadius: 2,
+                },
+              }}
+            >
+              Nuestros Productos
+            </Typography>
+
+            <Grid container spacing={4}>
+              {[
+                {
+                  name: "Chaqueta Premium",
+                  price: "$129.99",
+                  image:
+                    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80",
+                  category: "Destacado",
+                },
+                {
+                  name: "Pantalón Slim Fit",
+                  price: "$79.99",
+                  image:
+                    "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=80",
+                  category: "Nuevo",
+                },
+                {
+                  name: "Camisa Elegante",
+                  price: "$59.99",
+                  image:
+                    "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80",
+                  category: "Popular",
+                },
+                {
+                  name: "Zapatos Clásicos",
+                  price: "$149.99",
+                  image:
+                    "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80",
+                  category: "Destacado",
+                },
+              ].map((product, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      bgcolor: "transparent",
+                      position: "relative",
+                      overflow: "hidden",
+                      borderRadius: 3,
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      "&:hover": {
+                        transform: "translateY(-8px)",
+                        "& .product-overlay": {
+                          opacity: 1,
+                        },
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "relative",
+                        paddingTop: "120%",
+                        background: `url(${product.image})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        borderRadius: 3,
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: "rgba(0,0,0,0.3)",
+                          borderRadius: 3,
+                        },
+                      }}
+                    >
+                      <Box
+                        className="product-overlay"
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          bgcolor: "rgba(0,0,0,0.7)",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          opacity: 0,
+                          transition: "opacity 0.3s ease",
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          sx={{
+                            bgcolor: "#fff",
+                            color: "#000",
+                            "&:hover": {
+                              bgcolor: "#f0f0f0",
+                            },
+                          }}
+                        >
+                          Ver Detalles
+                        </Button>
+                      </Box>
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          top: 16,
+                          right: 16,
+                          bgcolor: "primary.main",
+                          color: "#fff",
+                          px: 2,
+                          py: 0.5,
+                          borderRadius: 5,
+                          fontSize: "0.875rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {product.category}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ p: 2, textAlign: "left" }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "1.1rem",
+                        }}
+                      >
+                        {product.name}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: mode === "dark" ? "#5363FF" : "#fff",
+                          fontWeight: 700,
+                          mt: 1,
+                        }}
+                      >
+                        {product.price}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Container>
+      </AnimatedBackground>
     </Box>
   );
 };

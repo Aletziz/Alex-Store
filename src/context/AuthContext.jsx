@@ -1,4 +1,7 @@
 import React, { createContext, useState, useContext } from "react";
+import { auth, storage } from "../firebase/config"; // Update this import
+import { updateProfile } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const AuthContext = createContext();
 
@@ -160,21 +163,42 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        updateUserPrivileges,
-        addRewardPoints,
-        verifyEmail,
-        sendVerificationEmail,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const updateUserProfile = async (updates) => {
+    try {
+      if (updates.photoFile) {
+        const storageRef = ref(
+          storage,
+          `profile_photos/${user.id}/${updates.photoFile.name}` // Changed from auth.currentUser.uid to user.id
+        );
+        await uploadBytes(storageRef, updates.photoFile);
+        const photoURL = await getDownloadURL(storageRef);
+
+        const updatedUser = {
+          ...user,
+          photoURL,
+        };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        return true;
+      }
+    } catch (error) {
+      console.error("Error actualizando perfil:", error);
+      throw error;
+    }
+  };
+
+  const value = {
+    user,
+    login,
+    logout,
+    updateUserPrivileges,
+    addRewardPoints,
+    verifyEmail,
+    sendVerificationEmail,
+    updateUserProfile,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

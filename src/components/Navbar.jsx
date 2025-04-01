@@ -18,6 +18,11 @@ import {
   ListItemText,
   Divider,
 } from "@mui/material";
+import { motion } from "framer-motion";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { Link, useNavigate } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -31,19 +36,309 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import Logo from "./Logo";
 
+// Añade el import al inicio del archivo
+import { ShippingAddressModal } from "./ShippingAddressModal";
+import { PaymentMethodModal } from "./PaymentMethodModal";
+import EditProfileModal from "./EditProfileModal";
+
+// Añade este componente Drawer después de los imports
+const SettingsDrawer = ({
+  open,
+  onClose,
+  mode,
+  toggleTheme,
+  notificationsEnabled,
+  handleNotificationsToggle,
+  onShippingClick,
+  onPaymentClick,
+  selectedCurrency,
+  onCurrencyChange,
+  selectedLanguage,
+  onLanguageChange,
+  selectedPaymentMethod, // Agregar esta prop
+}) => {
+  const [currencyMenu, setCurrencyMenu] = useState(null);
+  const [languageMenu, setLanguageMenu] = useState(null);
+
+  const currencies = [
+    { code: "CUP", name: "Peso Cubano (CUP)", symbol: "₱" },
+    { code: "USD", name: "Dólar Estadounidense (USD)", symbol: "$" },
+    { code: "MLC", name: "Moneda Libremente Convertible (MLC)", symbol: "MLC" },
+  ];
+
+  const paymentMethods = [
+    { id: "bandec", name: "BANDEC", icon: "🏦" },
+    { id: "popular", name: "Banco Popular", icon: "🏦" },
+    { id: "transfer", name: "Transferencia", icon: "💳" },
+  ];
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          width: 350,
+          background:
+            mode === "dark"
+              ? "linear-gradient(135deg, #1a1c2a 0%, #2d2f45 100%)"
+              : "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)",
+          p: 3,
+        },
+      }}
+    >
+      <Box sx={{ mb: 4 }}>
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 3,
+              fontWeight: 600,
+              background:
+                mode === "dark"
+                  ? "linear-gradient(45deg, #5363FF 30%, #7376F2 90%)"
+                  : "linear-gradient(45deg, #1e3a6d 30%, #2c4b8c 90%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            Configuración
+          </Typography>
+        </motion.div>
+
+        <List>
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <ListItem sx={{ mb: 2 }}>
+              <ListItemIcon>
+                <DarkModeIcon color={mode === "dark" ? "primary" : "inherit"} />
+              </ListItemIcon>
+              <ListItemText
+                primary="Modo Oscuro"
+                secondary="Cambia la apariencia de la aplicación"
+              />
+              <Switch checked={mode === "dark"} onChange={toggleTheme} />
+            </ListItem>
+          </motion.div>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <ListItem sx={{ mb: 2 }}>
+              <ListItemIcon>
+                <NotificationsIcon
+                  color={notificationsEnabled ? "primary" : "inherit"}
+                />
+              </ListItemIcon>
+              <ListItemText
+                primary="Notificaciones"
+                secondary="Recibe alertas de ofertas y pedidos"
+              />
+              <Switch
+                checked={notificationsEnabled}
+                onChange={handleNotificationsToggle}
+              />
+            </ListItem>
+          </motion.div>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ px: 2, mb: 1 }}
+          >
+            Preferencias de Compra
+          </Typography>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <ListItem button onClick={onShippingClick} sx={{ mb: 1 }}>
+              <ListItemIcon>
+                <LocalShippingIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Dirección de Envío"
+                secondary="Gestiona tus direcciones en Cuba"
+              />
+            </ListItem>
+          </motion.div>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <ListItem button onClick={onPaymentClick} sx={{ mb: 1 }}>
+              <ListItemIcon>
+                <CreditCardIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Métodos de Pago"
+                secondary={`${
+                  paymentMethods.find((m) => m.id === selectedPaymentMethod)
+                    ?.name || "Seleccionar método"
+                }`}
+              />
+            </ListItem>
+          </motion.div>
+
+          <Divider sx={{ my: 2 }} />
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ px: 2, mb: 1 }}
+          >
+            Personalización
+          </Typography>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <ListItem
+              button
+              onClick={(e) => setLanguageMenu(e.currentTarget)}
+              sx={{ mb: 1 }}
+            >
+              <ListItemIcon>
+                <LanguageIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Idioma"
+                secondary={selectedLanguage === "es" ? "Español" : "English"}
+              />
+            </ListItem>
+          </motion.div>
+
+          <Menu
+            anchorEl={languageMenu}
+            open={Boolean(languageMenu)}
+            onClose={() => setLanguageMenu(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                onLanguageChange("es");
+                setLanguageMenu(null);
+              }}
+            >
+              🇨🇺 Español
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onLanguageChange("en");
+                setLanguageMenu(null);
+              }}
+            >
+              🇺🇸 English
+            </MenuItem>
+          </Menu>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <ListItem
+              button
+              onClick={(e) => setCurrencyMenu(e.currentTarget)}
+              sx={{ mb: 1 }}
+            >
+              <ListItemIcon>
+                <AttachMoneyIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Moneda"
+                secondary={`${
+                  currencies.find((c) => c.code === selectedCurrency)?.name
+                }`}
+              />
+            </ListItem>
+          </motion.div>
+
+          <Menu
+            anchorEl={currencyMenu}
+            open={Boolean(currencyMenu)}
+            onClose={() => setCurrencyMenu(null)}
+          >
+            {currencies.map((currency) => (
+              <MenuItem
+                key={currency.code}
+                onClick={() => {
+                  onCurrencyChange(currency.code);
+                  setCurrencyMenu(null);
+                }}
+              >
+                {currency.symbol} {currency.name}
+              </MenuItem>
+            ))}
+          </Menu>
+        </List>
+      </Box>
+    </Drawer>
+  );
+};
+
 const Navbar = () => {
   const { mode, toggleTheme } = useTheme();
   const { cart } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
 
+  // Estados
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("es");
+  const [selectedCurrency, setSelectedCurrency] = useState("CUP");
+
+  // Manejadores
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShippingClick = () => {
+    navigate("/direccion-envio");
+    setSettingsOpen(false);
+  };
+
+  const handlePaymentClick = () => {
+    navigate("/metodo-pago");
+    setSettingsOpen(false);
+  };
+
+  // Agregar estados faltantes
+  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
+  const [currencyAnchorEl, setCurrencyAnchorEl] = useState(null);
+  const [shippingOpen, setShippingOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  // Agregar manejadores faltantes
+  const toggleSettings = () => {
+    setSettingsOpen(!settingsOpen);
   };
 
   const handleClose = () => {
@@ -56,13 +351,18 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const toggleSettings = () => {
-    setSettingsOpen(!settingsOpen);
-  };
-
   const handleNotificationsToggle = () => {
     setNotificationsEnabled(!notificationsEnabled);
-    // Here you would implement actual notifications logic
+  };
+
+  const handleLanguageChange = (lang) => {
+    setSelectedLanguage(lang);
+    setLanguageAnchorEl(null);
+  };
+
+  const handleCurrencyChange = (currency) => {
+    setSelectedCurrency(currency);
+    setCurrencyAnchorEl(null);
   };
 
   const handleLanguageClick = (event) => {
@@ -75,10 +375,21 @@ const Navbar = () => {
 
   const handlePrivacyClick = () => {
     setPrivacyOpen(true);
-    toggleSettings(); // Close settings drawer
+    toggleSettings();
     navigate("/privacy-settings");
   };
 
+  const handleProfileMenuClose = () => {
+    setProfileMenuAnchorEl(null);
+  };
+
+  // Reemplazar con esta única versión
+  const handleProfileMenuOpen = () => {
+    setEditProfileOpen(true);
+    handleClose();
+  };
+
+  // Asegurarse de que el return esté correctamente estructurado
   return (
     <>
       <AppBar
@@ -172,32 +483,239 @@ const Navbar = () => {
               Productos
             </Button>
 
-            <Button
-              color="inherit"
-              component={Link}
-              to="/login"
-              sx={{
-                transition: "all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
-                background: mode === "dark" ? "#5363FF30" : "#ffffff30",
-                px: 3,
-                py: 0.8,
-                color: mode === "dark" ? "#E8E9F3" : "#fff",
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                "&:hover": {
-                  transform: "scale(1.1)",
-                  background: mode === "dark" ? "#5363FF40" : "#ffffff40",
-                  boxShadow: `0 0 20px ${
-                    mode === "dark" ? "#5363FF30" : "#ffffff30"
-                  }`,
-                },
-                "&:active": {
-                  transform: "scale(0.9)",
-                },
-              }}
-            >
-              Iniciar Sesión
-            </Button>
+            {user ? (
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  onClick={handleMenu}
+                  sx={{
+                    transition:
+                      "all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+                    p: 1,
+                    border: "2px solid",
+                    borderColor: mode === "dark" ? "#5363FF40" : "#ffffff40",
+                    "&:hover": {
+                      transform: "scale(1.1)",
+                      borderColor: mode === "dark" ? "#5363FF" : "#fff",
+                    },
+                  }}
+                >
+                  {user.photoURL ? (
+                    <Avatar
+                      src={user.photoURL}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        border: "2px solid transparent",
+                      }}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1.5,
+                      background: mode === "dark" ? "#2A2B3D" : "#fff",
+                      borderRadius: 2,
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+                      minWidth: 220,
+                    },
+                  }}
+                >
+                  <Box sx={{ p: 2, textAlign: "center" }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {user.displayName || "Usuario"}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Nivel {user.level || 1}
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 1,
+                        width: "100%",
+                        height: 4,
+                        bgcolor: mode === "dark" ? "#ffffff20" : "#00000020",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: `${user.experience || 30}%`,
+                          height: "100%",
+                          bgcolor: mode === "dark" ? "#5363FF" : "#1e3a6d",
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  <Divider />
+                  <MenuItem onClick={handleClose} sx={{ py: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: mode === "dark" ? "#5363FF20" : "#1e3a6d20",
+                        }}
+                      >
+                        🏆
+                      </Box>
+                      <Box>
+                        <Typography variant="body1">Tus Recompensas</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {typeof user.rewards === "object"
+                            ? `${user.rewards.points || 0} puntos - ${
+                                user.rewards.tier || "Nivel Básico"
+                              }`
+                            : `${user.rewards || 0} puntos`}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem onClick={handleProfileMenuOpen} sx={{ py: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: mode === "dark" ? "#5363FF20" : "#1e3a6d20",
+                        }}
+                      >
+                        👤
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography>Editar Perfil</Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          transition: "color 0.2s ease",
+                          color: "text.secondary",
+                        }}
+                      >
+                        ❯
+                      </Box>
+                    </Box>
+                  </MenuItem>
+
+                  {user.isAdmin && (
+                    <MenuItem
+                      component={Link}
+                      to="/admin"
+                      onClick={handleClose}
+                      sx={{ py: 1.5 }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                          width: "100%",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            p: 1,
+                            borderRadius: 1,
+                            bgcolor:
+                              mode === "dark" ? "#5363FF20" : "#1e3a6d20",
+                          }}
+                        >
+                          ⚙️
+                        </Box>
+                        <Typography>Panel Admin</Typography>
+                      </Box>
+                    </MenuItem>
+                  )}
+                  <Divider />
+                  <MenuItem
+                    onClick={handleLogout}
+                    sx={{ py: 1.5, color: "error.main" }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: mode === "dark" ? "#ff535320" : "#ff535320",
+                        }}
+                      >
+                        🚪
+                      </Box>
+                      <Typography>Cerrar Sesión</Typography>
+                    </Box>
+                  </MenuItem>
+                </Menu>
+              </Box>
+            ) : (
+              <Button
+                color="inherit"
+                component={Link}
+                to="/login"
+                sx={{
+                  transition: "all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+                  background: mode === "dark" ? "#2A2B3D" : "#ffffff20",
+                  px: 2.5,
+                  py: 0.8,
+                  color: mode === "dark" ? "#E8E9F3" : "#fff",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  position: "relative",
+                  overflow: "hidden",
+                  "&:before": {
+                    content: '""',
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    width: "300%",
+                    height: "300%",
+                    backgroundColor: mode === "dark" ? "#5363FF" : "#ffffff40",
+                    transition: "all 0.5s ease",
+                    transform:
+                      "translate(-50%, -50%) rotate(45deg) translateY(100%)",
+                    opacity: 0,
+                  },
+                  "&:hover": {
+                    transform: "scale(1.05) translateY(-2px)",
+                    "&:before": {
+                      opacity: 0.1,
+                      transform:
+                        "translate(-50%, -50%) rotate(45deg) translateY(0)",
+                    },
+                  },
+                  "&:active": {
+                    transform: "scale(0.95) translateY(2px)",
+                  },
+                }}
+              >
+                Iniciar Sesión
+              </Button>
+            )}
 
             <IconButton
               color="inherit"
@@ -223,8 +741,6 @@ const Navbar = () => {
                   "& .MuiBadge-badge": {
                     background: mode === "dark" ? "#5363FF" : "#fff",
                     color: mode === "dark" ? "#fff" : "#1e3a6d",
-                    transition:
-                      "transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
                   },
                 }}
               >
@@ -233,15 +749,16 @@ const Navbar = () => {
             </IconButton>
 
             <IconButton
+              color="inherit"
               onClick={toggleSettings}
               sx={{
                 transition: "all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
-                p: 1.2,
+                p: 1,
                 "&:hover": {
-                  transform: "rotate(180deg) scale(1.2)",
+                  transform: "rotate(90deg) scale(1.2)",
                 },
                 "&:active": {
-                  transform: "rotate(180deg) scale(0.9)",
+                  transform: "rotate(45deg) scale(0.9)",
                 },
               }}
             >
@@ -250,67 +767,37 @@ const Navbar = () => {
           </Box>
         </Toolbar>
       </AppBar>
-
-      <Drawer
-        anchor="right"
+      {/* Añadir el SettingsDrawer aquí */}
+      <SettingsDrawer
         open={settingsOpen}
-        onClose={toggleSettings}
-        PaperProps={{
-          sx: {
-            width: 280,
-            bgcolor: "background.default",
-          },
-        }}
-      >
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <DarkModeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Modo Oscuro" />
-            <Switch checked={mode === "dark"} onChange={toggleTheme} />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemIcon>
-              <NotificationsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Notificaciones" />
-            <Switch
-              checked={notificationsEnabled}
-              onChange={handleNotificationsToggle}
-            />
-          </ListItem>
-          <ListItem button onClick={handleLanguageClick}>
-            <ListItemIcon>
-              <LanguageIcon />
-            </ListItemIcon>
-            <ListItemText primary="Idioma" />
-          </ListItem>
-          <ListItem button onClick={handlePrivacyClick}>
-            <ListItemIcon>
-              <SecurityIcon />
-            </ListItemIcon>
-            <ListItemText primary="Privacidad" />
-          </ListItem>
-        </List>
-      </Drawer>
+        onClose={() => setSettingsOpen(false)}
+        mode={mode}
+        toggleTheme={toggleTheme}
+        notificationsEnabled={notificationsEnabled}
+        handleNotificationsToggle={handleNotificationsToggle}
+        onShippingClick={handleShippingClick}
+        onPaymentClick={handlePaymentClick}
+        selectedCurrency={selectedCurrency}
+        onCurrencyChange={handleCurrencyChange}
+        selectedLanguage={selectedLanguage}
+        onLanguageChange={handleLanguageChange}
+        selectedPaymentMethod={selectedPaymentMethod} // Agregar esta prop
+      />
 
-      <Menu
-        anchorEl={languageAnchorEl}
-        open={Boolean(languageAnchorEl)}
-        onClose={handleLanguageClose}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            minWidth: 120,
-          },
-        }}
-      >
-        <MenuItem onClick={handleLanguageClose}>Español</MenuItem>
-        <MenuItem onClick={handleLanguageClose}>English</MenuItem>
-        <MenuItem onClick={handleLanguageClose}>Français</MenuItem>
-      </Menu>
+      <ShippingAddressModal
+        open={shippingOpen}
+        onClose={() => setShippingOpen(false)}
+      />
+
+      <PaymentMethodModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+      />
+
+      <EditProfileModal
+        open={editProfileOpen}
+        onClose={() => setEditProfileOpen(false)}
+      />
     </>
   );
 };
