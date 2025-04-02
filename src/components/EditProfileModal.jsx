@@ -4,211 +4,143 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   TextField,
+  Button,
   Box,
   Avatar,
-  IconButton,
-  Typography,
-  Alert,
 } from "@mui/material";
-import { useTheme } from "../context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { updateProfile, updatePassword } from "firebase/auth";
 
 const EditProfileModal = ({ open, onClose }) => {
-  const { mode } = useTheme();
   const { user, updateUserProfile } = useAuth();
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const handlePhotoUpload = async (event) => {
-    try {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      setLoading(true);
-      await updateUserProfile({
-        photoFile: file,
-      });
-      setSuccess("Foto actualizada correctamente");
-    } catch (error) {
-      setError("Error al actualizar la foto");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [formData, setFormData] = useState({
+    displayName: user?.displayName || "",
+    photoURL: user?.photoURL || "",
+    email: user?.email || "",
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
-
     try {
-      const updates = {};
-
-      if (displayName !== user.displayName) {
-        updates.displayName = displayName;
-      }
-
-      if (photoURL !== user.photoURL) {
-        updates.photoURL = photoURL;
-      }
-
-      if (Object.keys(updates).length > 0) {
-        await updateProfile(user, updates);
-      }
-
-      if (newPassword) {
-        if (newPassword !== confirmPassword) {
-          throw new Error("Las contraseñas no coinciden");
-        }
-        await updatePassword(user, newPassword);
-      }
-
-      setSuccess("Perfil actualizado correctamente");
-      setTimeout(() => {
-        onClose();
-        window.location.reload();
-      }, 1500);
+      await updateUserProfile(formData);
+      onClose();
     } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      console.error("Error updating profile:", error);
     }
   };
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          bgcolor: mode === "dark" ? "#2A2B3D" : "#fff",
-          borderRadius: 2,
-          minWidth: { xs: "90%", sm: 400 },
-        },
-      }}
-    >
-      <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
-        Editar Perfil
-      </DialogTitle>
-      <DialogContent>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              mb: 3,
-            }}
-          >
-            <Box sx={{ position: "relative" }}>
-              <Avatar
-                src={photoURL}
-                sx={{
-                  width: 100,
-                  height: 100,
-                  border: `3px solid ${
-                    mode === "dark" ? "#5363FF" : "#1e3a6d"
-                  }`,
-                }}
-              />
-              <IconButton
-                component="label"
-                sx={{
-                  position: "absolute",
-                  bottom: -10,
-                  right: -10,
-                  bgcolor: mode === "dark" ? "#5363FF" : "#1e3a6d",
-                  color: "#fff",
-                  "&:hover": {
-                    bgcolor: mode === "dark" ? "#4353EF" : "#152a5c",
-                  },
-                }}
+    <AnimatePresence>
+      {open && (
+        <Dialog
+          open={open}
+          onClose={onClose}
+          PaperProps={{
+            component: motion.div,
+            initial: { opacity: 0, y: -20 },
+            animate: { opacity: 1, y: 0 },
+            exit: { opacity: 0, y: 20 },
+            transition: { duration: 0.3 },
+          }}
+        >
+          <DialogTitle>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2 }}
               >
-                <input
-                  hidden
-                  accept="image/*"
-                  type="file"
-                  onChange={handlePhotoUpload}
+                <Avatar
+                  src={formData.photoURL}
+                  sx={{ width: 56, height: 56 }}
                 />
-                <PhotoCamera />
-              </IconButton>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Editar Perfil
+              </motion.div>
             </Box>
-          </Box>
-
-          <TextField
-            fullWidth
-            label="Nombre"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          <TextField
-            fullWidth
-            label="Nueva Contraseña"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          <TextField
-            fullWidth
-            label="Confirmar Contraseña"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-        </Box>
-      </DialogContent>
-      <DialogActions sx={{ p: 2, pt: 0 }}>
-        <Button
-          onClick={onClose}
-          sx={{
-            color: mode === "dark" ? "#fff" : "#1e3a6d",
-          }}
-        >
-          Cancelar
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={loading}
-          variant="contained"
-          sx={{
-            bgcolor: mode === "dark" ? "#5363FF" : "#1e3a6d",
-            "&:hover": {
-              bgcolor: mode === "dark" ? "#4353EF" : "#152a5c",
-            },
-          }}
-        >
-          {loading ? "Guardando..." : "Guardar Cambios"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          </DialogTitle>
+          <form onSubmit={handleSubmit}>
+            <DialogContent>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="displayName"
+                  label="Nombre"
+                  value={formData.displayName}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="photoURL"
+                  label="URL de foto"
+                  value={formData.photoURL}
+                  onChange={handleChange}
+                  sx={{ mb: 2 }}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="email"
+                  label="Email"
+                  value={formData.email}
+                  disabled
+                />
+              </motion.div>
+            </DialogContent>
+            <DialogActions sx={{ p: 2 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Button onClick={onClose}>Cancelar</Button>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <Button type="submit" variant="contained" color="primary">
+                  Guardar
+                </Button>
+              </motion.div>
+            </DialogActions>
+          </form>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 };
 

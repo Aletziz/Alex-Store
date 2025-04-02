@@ -35,6 +35,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import Logo from "./Logo";
+import UserRewardsDialog from "./UserRewardsDialog";
 
 // Añade el import al inicio del archivo
 import { ShippingAddressModal } from "./ShippingAddressModal";
@@ -303,50 +304,25 @@ const Navbar = () => {
   // Estados
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [editProfileOpen, setEditProfileOpen] = useState(false);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
-  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("es");
-  const [selectedCurrency, setSelectedCurrency] = useState("CUP");
-
-  // Manejadores
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleShippingClick = () => {
-    navigate("/direccion-envio");
-    setSettingsOpen(false);
-  };
-
-  const handlePaymentClick = () => {
-    navigate("/metodo-pago");
-    setSettingsOpen(false);
-  };
-
-  // Agregar estados faltantes
-  const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
-  const [currencyAnchorEl, setCurrencyAnchorEl] = useState(null);
   const [shippingOpen, setShippingOpen] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState("CUP");
+  const [selectedLanguage, setSelectedLanguage] = useState("es");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("bandec");
 
-  // Agregar manejadores faltantes
-  const toggleSettings = () => {
-    setSettingsOpen(!settingsOpen);
+  // Handlers
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     handleClose();
     navigate("/");
   };
@@ -355,41 +331,44 @@ const Navbar = () => {
     setNotificationsEnabled(!notificationsEnabled);
   };
 
-  const handleLanguageChange = (lang) => {
-    setSelectedLanguage(lang);
-    setLanguageAnchorEl(null);
+  const handleShippingClick = () => {
+    setShippingOpen(true);
+    setSettingsOpen(false);
+  };
+
+  const handlePaymentClick = () => {
+    setPaymentOpen(true);
+    setSettingsOpen(false);
   };
 
   const handleCurrencyChange = (currency) => {
     setSelectedCurrency(currency);
-    setCurrencyAnchorEl(null);
   };
 
-  const handleLanguageClick = (event) => {
-    setLanguageAnchorEl(event.currentTarget);
+  const handleLanguageChange = (language) => {
+    setSelectedLanguage(language);
   };
 
-  const handleLanguageClose = () => {
-    setLanguageAnchorEl(null);
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const handlePrivacyClick = () => {
-    setPrivacyOpen(true);
-    toggleSettings();
-    navigate("/privacy-settings");
-  };
-
-  const handleProfileMenuClose = () => {
-    setProfileMenuAnchorEl(null);
-  };
-
-  // Reemplazar con esta única versión
   const handleProfileMenuOpen = () => {
     setEditProfileOpen(true);
     handleClose();
   };
 
-  // Asegurarse de que el return esté correctamente estructurado
+  const toggleSettings = () => {
+    setSettingsOpen(!settingsOpen);
+  };
+
+  const handleRewardsClick = () => {
+    setRewardsDialogOpen(true);
+    handleClose();
+  };
+
+  const [rewardsDialogOpen, setRewardsDialogOpen] = useState(false);
+
   return (
     <>
       <AppBar
@@ -797,6 +776,11 @@ const Navbar = () => {
       <EditProfileModal
         open={editProfileOpen}
         onClose={() => setEditProfileOpen(false)}
+      />
+
+      <UserRewardsDialog
+        open={rewardsDialogOpen}
+        onClose={() => setRewardsDialogOpen(false)}
       />
     </>
   );

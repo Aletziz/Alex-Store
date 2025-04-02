@@ -14,6 +14,7 @@ import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { RewardsProvider } from "./context/RewardsContext";
 import ShippingAddressModal from "./components/ShippingAddressModal";
 import PaymentMethodModal from "./components/PaymentMethodModal";
 import EditProfileModal from "./components/EditProfileModal";
@@ -94,52 +95,54 @@ function App() {
   };
 
   return (
-    <ThemeProvider>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        <AuthProvider>
-          <CartProvider>
-            <Router>
-              <Navbar
-                mode={mode}
-                toggleTheme={toggleTheme}
-                selectedLanguage={selectedLanguage}
-                selectedCurrency={selectedCurrency}
-                selectedPaymentMethod={selectedPaymentMethod}
-                settingsOpen={settingsOpen}
-                setSettingsOpen={setSettingsOpen}
-                onShippingClick={handleShippingClick}
-                onPaymentClick={handlePaymentClick}
-                onLanguageChange={handleLanguageChange}
-                onCurrencyChange={handleCurrencyChange}
-                onSettingsOpen={handleSettingsOpen}
-                onSettingsClose={handleSettingsClose}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                languageAnchorEl={languageAnchorEl}
-                setLanguageAnchorEl={setLanguageAnchorEl}
-                currencyAnchorEl={currencyAnchorEl}
-                setCurrencyAnchorEl={setCurrencyAnchorEl}
-              />
-              <Routes>
-                <Route path="/" element={<Productos />} />
-                <Route path="/productos" element={<Productos />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/registro" element={<Register />} />
-                <Route path="/perfil/editar" element={<EditProfileModal />} />
-                <Route
-                  path="/direccion-envio"
-                  element={<ShippingAddressModal />}
+    <AuthProvider>
+      <CartProvider>
+        <ThemeProvider>
+          <RewardsProvider>
+            <MuiThemeProvider theme={theme}>
+              <CssBaseline />
+              <Router>
+                <Navbar
+                  mode={mode}
+                  toggleTheme={toggleTheme}
+                  selectedLanguage={selectedLanguage}
+                  selectedCurrency={selectedCurrency}
+                  selectedPaymentMethod={selectedPaymentMethod}
+                  settingsOpen={settingsOpen}
+                  setSettingsOpen={setSettingsOpen}
+                  onShippingClick={handleShippingClick}
+                  onPaymentClick={handlePaymentClick}
+                  onLanguageChange={handleLanguageChange}
+                  onCurrencyChange={handleCurrencyChange}
+                  onSettingsOpen={handleSettingsOpen}
+                  onSettingsClose={handleSettingsClose}
+                  anchorEl={anchorEl}
+                  setAnchorEl={setAnchorEl}
+                  languageAnchorEl={languageAnchorEl}
+                  setLanguageAnchorEl={setLanguageAnchorEl}
+                  currencyAnchorEl={currencyAnchorEl}
+                  setCurrencyAnchorEl={setCurrencyAnchorEl}
                 />
-                <Route path="/metodo-pago" element={<PaymentMethodModal />} />
-                <Route path="/privacidad" element={<PrivacySettings />} />
-                <Route path="/admin" element={<AdminPanel />} />
-              </Routes>
-            </Router>
-          </CartProvider>
-        </AuthProvider>
-      </MuiThemeProvider>
-    </ThemeProvider>
+                <Routes>
+                  <Route path="/" element={<Productos />} />
+                  <Route path="/productos" element={<Productos />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/registro" element={<Register />} />
+                  <Route path="/perfil/editar" element={<EditProfileModal />} />
+                  <Route
+                    path="/direccion-envio"
+                    element={<ShippingAddressModal />}
+                  />
+                  <Route path="/metodo-pago" element={<PaymentMethodModal />} />
+                  <Route path="/privacidad" element={<PrivacySettings />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                </Routes>
+              </Router>
+            </MuiThemeProvider>
+          </RewardsProvider>
+        </ThemeProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

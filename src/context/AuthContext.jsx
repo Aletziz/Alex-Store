@@ -2,6 +2,8 @@ import React, { createContext, useState, useContext } from "react";
 import { auth, storage } from "../firebase/config"; // Update this import
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const AuthContext = createContext();
 
@@ -163,26 +165,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUserProfile = async (updates) => {
+  const updateUserProfile = async (profileData) => {
     try {
-      if (updates.photoFile) {
-        const storageRef = ref(
-          storage,
-          `profile_photos/${user.id}/${updates.photoFile.name}` // Changed from auth.currentUser.uid to user.id
-        );
-        await uploadBytes(storageRef, updates.photoFile);
-        const photoURL = await getDownloadURL(storageRef);
+      const user = auth.currentUser;
+      await updateProfile(user, {
+        displayName: profileData.displayName,
+        photoURL: profileData.photoURL,
+      });
 
-        const updatedUser = {
-          ...user,
-          photoURL,
-        };
-        setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        return true;
-      }
+      // Update local user state
+      setUser((prevUser) => ({
+        ...prevUser,
+        displayName: profileData.displayName,
+        photoURL: profileData.photoURL,
+      }));
+
+      // Update in database if needed
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        displayName: profileData.displayName,
+        photoURL: profileData.photoURL,
+        updatedAt: serverTimestamp(),
+      });
     } catch (error) {
-      console.error("Error actualizando perfil:", error);
       throw error;
     }
   };
